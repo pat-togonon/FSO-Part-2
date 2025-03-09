@@ -20,12 +20,20 @@ const App = () => {
   const [numberToUpdate, setNumberToUpdate] = useState('');
   const [messageNotification, setMessageNotification] = useState(null);
   const [errorNotification, setErrorNotification] = useState(null);
+  const [getAllErrorMsg, setGetAllErrorMsg] = useState(null);
+  const [createErrorMsg, setCreateErrorMsg] = useState(null);
 
   useEffect(() => {
     personService
       .getAll()
       .then(initialPersons => {
         setPersons(initialPersons);
+      })
+      .catch(error => {
+        setGetAllErrorMsg('Phonebook contacts have failed to load. Please try again later.')
+        setTimeout(() => {
+          setGetAllErrorMsg(null);
+         }, 5000);
       })   
   }, []);
 
@@ -76,6 +84,12 @@ const App = () => {
           .create(newPerson)
           .then(returnedList => {
             setPersons(persons.concat(returnedList));
+          })
+          .catch(error => {
+            setCreateErrorMsg('Failed to add contact to your phonebook. Please try again later.');
+            setTimeout(() => {
+              setCreateErrorMsg(null);
+             }, 5000);
           });
 
           setMessageNotification(`${addedName} has been successfully added to your phonebook!`);
@@ -206,6 +220,8 @@ const App = () => {
   return (
     <div>
       <Header header="Phonebook" />
+      <ErrorNotification message={getAllErrorMsg} />
+      <ErrorNotification message={createErrorMsg} />
       <Notification message={messageNotification} />
       <ErrorNotification message={errorNotification} />
       <Filter value={searchFor} onChange={searchFilter} onClick={handleSearch} />
